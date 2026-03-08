@@ -1,0 +1,1 @@
+# Lightweight by design: built-in Python libraries only.
