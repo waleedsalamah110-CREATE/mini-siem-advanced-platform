@@ -1,0 +1,27 @@
+title: Privilege Escalation Group Membership Change
+id: RULE-PRIV-001
+status: experimental
+description: Detects administrative privilege assignment activity.
+author: Waleed Salamah
+logsource:
+  product: windows
+  category: account_management
+detection:
+  selection:
+    event_type: privilege_change
+    privilege_change|contains:
+      - Administrators
+      - admin
+      - elevated
+condition: selection
+level: critical
+tags:
+  - attack.privilege_escalation
+  - attack.t1068
+falsepositives:
+  - Legitimate admin changes
+references:
+  - Portfolio project
+mitre_tactic: Privilege Escalation
+mitre_technique_id: T1068
+mitre_technique_name: Exploitation for Privilege Escalation

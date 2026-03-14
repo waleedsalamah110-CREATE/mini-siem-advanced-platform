@@ -1,64 +1,65 @@
 # Mini SIEM Detection Platform
 
-A **portfolio-grade, local Python mini-SIEM** that simulates a junior detection engineering workflow:
-**log ingestion → normalization → rule-based detections → MITRE ATT&CK mapping → structured alert output → SOC-style reporting**.
+A portfolio-grade Python mini-SIEM that simulates a junior detection engineering workflow:
 
-This project is intentionally lightweight (no web app, no Flask/Django) and is designed to be easy to demo in interviews:
+**log ingestion → normalization → rule-based detections → MITRE ATT&CK mapping → structured alert output → SOC-style reporting**
 
-- Detection logic is modular and readable
-- Outputs look like SOC triage artifacts (JSON alerts + terminal summary)
-- Raw logs are preserved for investigation pivots
-
----
+This project is intentionally lightweight and local-first. It is designed to be easy to explain in interviews and easy to run from the command line.
 
 ## Overview
 
-`mini-siem-detection-platform` ingests JSON logs from `data/sample_logs.json`, normalizes them into a **common event schema**, executes several **rule-based detections**, enriches alerts with **MITRE ATT&CK** metadata, writes the results to `alerts_output.json`, and prints a **SOC-style detection summary**.
-
----
+`mini-siem-detection-platform` ingests JSON log data from `data/sample_logs.json`, normalizes events into a common schema, applies rule-based detections, enriches alerts with MITRE ATT&CK context, writes structured alert output to `output/alerts_output.json`, and prints a SOC-style terminal summary.
 
 ## Features
 
-- **Log ingestion** from JSON with safe parsing
-- **Normalization** to a common event schema with investigator-friendly pivots
-- **Detection engine** running multiple rules
-- **MITRE ATT&CK mapping** per rule
-- **Structured JSON alerts** for downstream workflows
-- **SOC-style terminal report** (totals, severities, affected entities, per-rule counts)
-
----
+- Log ingestion from JSON with safe parsing
+- Event normalization into a common schema
+- Rule-based detection logic for common SOC use cases
+- MITRE ATT&CK mapping per alert
+- Structured JSON alert export
+- SOC-style terminal summary reporting
+- Modular Python project structure for future expansion
 
 ## Architecture / Project Structure
 
-```
+```text
 mini-siem-detection-platform/
 ├── main.py
 ├── requirements.txt
 ├── README.md
-├── alerts_output.json
 ├── config/
 │   ├── __init__.py
 │   └── settings.py
 ├── data/
 │   └── sample_logs.json
-├── ingestion/
-│   ├── __init__.py
-│   ├── loader.py
-│   └── normalizer.py
 ├── detections/
 │   ├── __init__.py
 │   ├── brute_force.py
 │   ├── suspicious_powershell.py
 │   ├── privilege_escalation.py
 │   ├── impossible_travel.py
-│   └── engine.py
+│   ├── engine.py
+│   └── rule_engine.py
+├── ingestion/
+│   ├── __init__.py
+│   ├── loader.py
+│   ├── normalizer.py
+│   └── rule_loader.py
 ├── mappings/
 │   ├── __init__.py
 │   └── mitre_attack.py
+├── output/
+│   └── alerts_output.json
 ├── reporting/
 │   ├── __init__.py
 │   ├── alert_writer.py
 │   └── summary_report.py
+├── rules/
+│   ├── suspicious_powershell.yml
+│   ├── privilege_escalation.yml
+│   ├── brute_force.yml
+│   └── impossible_travel.yml
+├── tests/
 └── utils/
     ├── __init__.py
     └── helpers.py

@@ -1,43 +1,30 @@
-from __future__ import annotations
-
-import json
-import sys
-from pathlib import Path
-
-from config.settings import Settings
-from detections.engine import run_all_detections
-from ingestion.loader import load_json_logs
+from ingestion.loader import load_logs
 from ingestion.normalizer import normalize_logs
-from reporting.alert_writer import write_alerts_json
-from reporting.summary_report import print_summary_report
+from detections.engine import run_detections
+from detections.rule_loader import load_rules
+from detections.rule_engine import run_yaml_rules
+from reporting.alert_writer import write_alerts_to_json
+from reporting.summary_report import generate_summary, print_summary
 
 
-def main() -> int:
-    settings = Settings()
+def main():
+    raw_logs = load_logs("data/sample_logs.json")
+    normalized_logs = normalize_logs(raw_logs)
 
-    raw_logs = load_json_logs(settings.SAMPLE_LOG_PATH)
-    events = normalize_logs(raw_logs)
+    python_alerts = run_detections(normalized_logs)
 
-    alerts = run_all_detections(
-        events=events,
-        settings=settings,
-    )
+    yaml_rules = load_rules("rules")
+    yaml_alerts = run_yaml_rules(normalized_logs, yaml_rules)
 
-    write_alerts_json(alerts, settings.ALERTS_OUTPUT_PATH)
+    all_alerts = python_alerts + yaml_alerts
 
-    print_summary_report(
-        alerts=alerts,
-        settings=settings,
-        total_events=len(events),
-        total_raw_logs=len(raw_logs),
-    )
+    write_alerts_to_json(all_alerts, "alerts_output.json")
 
-    return 0
+    summary = generate_summary(all_alerts)
+    print_summary(summary)
+
+    print("\nAlerts written to alerts_output.json")
 
 
 if __name__ == "__main__":
-    try:
-        raise SystemExit(main())
-    except KeyboardInterrupt:
-        print("\n[!] Interrupted by user.", file=sys.stderr)
-        raise
+    main()
